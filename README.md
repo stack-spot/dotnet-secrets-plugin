@@ -1,0 +1,1 @@
+# dotnet-secrets-app-plugin
