@@ -1,0 +1,77 @@
+name: dotnet-secrets-app-plugin
+description: Plugin para instrumentar o AWS Secret Manager.
+types:
+- app
+inputs:
+- label: TTL Cache ms
+  type: text
+  name: cache_item_ttl
+  default: "3700000"
+- label: Maximum Cache Size
+  type: text
+  name: max_cache_size
+  default: "1024"  
+- label: Version Stage
+  type: text
+  name: version_stage
+  default: "AWSCURRENT"    
+- label: Region Endpoint
+  type: text
+  name: region_endpoint
+  default: "sa-east-1"
+
+computed-inputs:
+  base_path: "{% if global_computed_inputs.src_base_path is defined and global_computed_inputs.src_base_path != '' %}{{global_computed_inputs.src_base_path}}{% else %}{{'.'}}{% endif %}"
+
+hooks:
+#package
+  - type: run
+    trigger: before-render
+    commands:
+      - dotnet add {{computed_inputs.base_path}}/src/{{global_inputs.project_name}}.Application package StackSpot.Secrets
+      - dotnet add {{computed_inputs.base_path}}/src/{{global_inputs.project_name}}.Infrastructure package StackSpot.Secrets
+#dependencyinjection
+  - type: edit
+    trigger: before-render
+    path: "{{computed_inputs.base_path}}/src/{{project_name}}.Application/Common/StackSpot/DependencyInjection.cs"
+    changes:
+      - search:
+          string: "using"
+          insert-before:
+            value: "using StackSpot.Secrets;"
+          when:
+            not-exists: "using StackSpot.Secrets;"
+      - search:
+          string: "return services"
+          insert-before:
+            value: "services.AddSecretsManager(configuration, environment);\n"
+          when:
+            not-exists: "services.AddSecretsManager(configuration, environment);"
+#format
+  - type: run
+    trigger: after-render
+    working-dir: "{{computed_inputs.base_path}}/src/{{project_name}}.Application"
+    commands:
+      -  dotnet dotnet-format --include-generated
+
+displayName: Secrets
+
+picture: "plugin.png"
+
+category: Backend, Secrets
+
+compatibility:
+  - net5.0
+  - net6.0
+
+about: docs/about.md
+
+usage: docs/usage.md
+
+useCase: docs/use-case.md
+
+implementation: docs/implementation.md
+
+technologies: 
+  - .NET
+  - C#  
