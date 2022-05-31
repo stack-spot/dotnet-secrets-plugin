@@ -1,4 +1,4 @@
-name: dotnet-secrets-app-plugin
+name: dotnet-secrets-plugin
 description: Plugin para instrumentar o AWS Secret Manager.
 types:
 - app
