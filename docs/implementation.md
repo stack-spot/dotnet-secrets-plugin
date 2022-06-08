@@ -83,7 +83,6 @@ services:
 
 Após a criação do container, crie uma secret para realizar os testes com o componente. É recomendado que você tenha instalado o [AWS CLI](https://aws.amazon.com/pt/cli/). Confira um exemplo de comando para criação de uma secret:  
 
-```
-bash
+```bash
 aws --endpoint-url=http://localhost:4566 --region=sa-east-1 secretsmanager create-secret --name [NOME DA SUA SECRET] --description [DESCRIÇÃO DA SUA SECRET] --secret-string [VALOR DA SUA SECRET] 
 ```
